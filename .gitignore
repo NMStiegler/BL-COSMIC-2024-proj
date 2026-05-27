@@ -1,5 +1,6 @@
 # Ignore the plots directory
 plots/
+*.png
 
 # Ignore data
 frequency_adjacency/adjacent_in_all

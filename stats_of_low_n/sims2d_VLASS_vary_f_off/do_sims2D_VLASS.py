@@ -146,13 +146,14 @@ def sim_one(n_fine, n_ints, n_pols, n_complex, drifts, snr_thresh=8, PFB_filepat
 if __name__ == "__main__":
     # Do at different SNRs
     snrs = np.arange(5, 15.5, 0.5)
-    n_ints_to_simulate = [16]
+    n_ints = 64
+    f_offs = np.arange(2, 11, 1) * 1e-6 # Frequency bin widths in MHz
     total_results = []
-    for n_ints in n_ints_to_simulate:
+    for f_off in f_offs:
         result_at_n_ints = [] 
         for snr in snrs:
             with open("log2d.txt", "a") as f:
-                f.write(f"on snr: {snr} n_ints: {n_ints} at {datetime.now()}\n")
+                f.write(f"on snr: {snr} f_off: {f_off} at {datetime.now()}\n")
             individual_result = []
             # repeat trial 5x
             for i in range(5):
@@ -182,7 +183,7 @@ if __name__ == "__main__":
                 """
                 count = sim_one(n_fine, n_ints, n_pols, n_complex, drifts, snr_thresh=snr, 
                                 PFB_filepath='',
-                                f_off=7.63e-06, t_samp=8.338608 / n_ints, freq=3000)
+                                f_off=f_off, t_samp=8.338608 / 64, freq=3000)
                 individual_result.append(count)
             result_at_n_ints.append(individual_result)
         total_results.append(result_at_n_ints)
@@ -190,4 +191,4 @@ if __name__ == "__main__":
     to_save = np.array(total_results)
     np.save("results2d.npy", to_save)
     np.save("snrs2d.npy", snrs)
-    np.save("n_ints2d.npy", n_ints_to_simulate)
+    np.save("f_offs.npy", f_offs)

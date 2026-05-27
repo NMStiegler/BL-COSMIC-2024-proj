@@ -49,7 +49,9 @@ def gen_obs_data(n_fine, n_ints, n_pols, n_complex, PFB_filepath=""):
     data =  np.sum(data, axis=2)
 
     # Add PFB correction
-    if PFB_filepath != "": # '/home/nstiegle/raw_data_work/COSMIC_response.f32' for high freq data
+    if PFB_filepath != "": # '/home/nstiegle/raw_data_work/VLASS_response.f32' '/home/nstiegle/raw_data_work/COSMIC_response.f32' for high freq data
+        print("Reading PFB file")
+        
         # Read in PFB shape data
         with open(PFB_filepath, 'rb') as f:
             # Use numpy's fromfile method to read in the 32-bit floats
@@ -58,6 +60,8 @@ def gen_obs_data(n_fine, n_ints, n_pols, n_complex, PFB_filepath=""):
         # Check shapes and apply PFB correction to data
         assert(len(pfb) == data.shape[1])
         before_shape = data.shape
+
+        print("Applying PFB shape")
         data *= pfb
         assert(data.shape == before_shape)
 
@@ -144,9 +148,11 @@ def sim_one(n_fine, n_ints, n_pols, n_complex, drifts, snr_thresh=8, PFB_filepat
 # Run Simulation
 ################################################################################
 if __name__ == "__main__":
+    print("Starting")
+    
     # Do at different SNRs
-    snrs = np.arange(5, 15.5, 0.5)
-    n_ints_to_simulate = [64]
+    snrs = np.arange(-1, 9, 0.5)
+    n_ints_to_simulate = [16]
     total_results = []
     for n_ints in n_ints_to_simulate:
         result_at_n_ints = [] 
@@ -182,7 +188,7 @@ if __name__ == "__main__":
                 """
                 count = sim_one(n_fine, n_ints, n_pols, n_complex, drifts, snr_thresh=snr, 
                                 PFB_filepath='/home/nstiegle/raw_data_work/VLASS_response.f32',
-                                f_off=7.63e-06, t_samp=8.338608 / 64, freq=3000)
+                                f_off=7.63e-06, t_samp=8.338608 / n_ints, freq=3000)
                 individual_result.append(count)
             result_at_n_ints.append(individual_result)
         total_results.append(result_at_n_ints)
@@ -191,3 +197,5 @@ if __name__ == "__main__":
     np.save("results2d_PFB.npy", to_save)
     np.save("snrs2d_PFB.npy", snrs)
     np.save("n_ints2d_PFB.npy", n_ints_to_simulate)
+
+    print("Done")
